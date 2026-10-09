@@ -1,0 +1,30 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "C/C++: gcc.exe build active file",
+			"command": "C:\\msys64\\ucrt64\\bin\\gcc.exe",
+			"args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${workspaceFolder}\\src\\main.c",
+                "${workspaceFolder}\\src\\audio.c",
+                "${workspaceFolder}\\src\\effects.c",
+                "-I",
+                "${workspaceFolder}\\src\\lib",
+                "-lm",
+                "-o",
+                "${workspaceFolder}\\build\\pedal.exe"
+            ],
+			"options": {
+				"cwd": "${fileDirname}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+			"detail": "compiler: C:\\msys64\\ucrt64\\bin\\gcc.exe"
+		}
+	]
+}
