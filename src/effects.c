@@ -1,13 +1,28 @@
 #include "effects.h"
+#include <math.h>
 
-float effect_fuzz(float sample, void *params)
+float low_pass(float input, float alpha)    //low pass filter
 {
-    FuzzParams *p = (FuzzParams *)params;
+    static float prev_out = 0.0f;
+    float output = prev_out + alpha * (input - prev_out);   //sta je alpha blizi 0 to je filter jaci, u pravilu izmedu 0.1 i 1.0
+    prev_out = output;
+    return output;
+}
 
-    float sample_amp = sample * p->gain; // pojacani signal
-    if (sample_amp > p->drive_positive)
-        return p->drive_positive * sample_amp; // clipping pozitivnog dijela signala
-    if (sample_amp < p->drive_negative)
-        return p->drive_negative * sample_amp; // clipping negativnog dijela signala
-    return sample_amp;                         // clean djelovi
+float effect_fuzz(float sample, void *params, float alpha) // fuzz efekt
+{
+    FuzzParams *p = (FuzzParams *)params; // dohvaca parametre specificne za fuzz
+
+    float output = sample * p->gain; // prvi stage (preamp)
+
+    if (output > p->drive_positive) //clipping
+        output = p->drive_positive;
+    if (output < p->drive_negative)
+        output = p->drive_negative;
+
+    // low pass je potreban jer be njega ima GROZAN noise i doslovno se nemoze slusat, DC filter je pozeljan jer duh
+    // alpha je obicno u rasponu 0.1-0.3, sta vise to je jaci filter
+    output = low_pass(output, alpha);
+
+    return output;
 }

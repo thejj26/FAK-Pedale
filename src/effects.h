@@ -7,6 +7,8 @@ typedef struct {
     float drive_negative;
 } FuzzParams;
 
-float effect_fuzz(float sample, void* params);
+float low_pass(float input, float alpha);
+
+float effect_fuzz(float sample, void* params, float alpha);
 
 #endif

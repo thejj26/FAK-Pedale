@@ -3,24 +3,21 @@
 #include "effects.h"
 
 int main(void) {
-    printf("=== Modular Audio Pedal Running ===\n");
-    
-    EffectFunction selected_effect = effect_fuzz;
+    EffectFunction selected_effect = effect_fuzz;   //odadbrani efekt
 
-    FuzzParams fuzz_params = {
-        .gain = 12.0f,
-        .drive_positive = 0.8f,
-        .drive_negative = -0.5f
+    FuzzParams fuzz_params = {  //postavke za fuzz
+        .gain = 10.0f,   //gain (no shit)
+        .drive_positive = 0.8f, //drive za pozitivni dio
+        .drive_negative = -0.5f //drive za negativni dio (sta blize 0 to ce bit vise retro/warm)
     };
 
-    if (start_audio_engine("input.mp3", selected_effect, &fuzz_params) != 0) {
+    if (start_audio_engine("input.mp3", selected_effect, &fuzz_params, 0.15f) != 0) {  //pcoinje audio engine
         return -1;
     }
 
-    printf("Playing with selected effect... Press ENTER to stop.\n");
+    printf("ENTER to stop...\n");
     getchar();
 
     stop_audio_engine();
-    printf("Audio stopped.\n");
     return 0;
 }
