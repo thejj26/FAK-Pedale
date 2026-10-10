@@ -1,0 +1,9 @@
+{
+    "CmajorVersion": 1,
+    "ID": "com.fak.faking_distorsion",
+    "version": "1.0",
+    "name": "FAKing distorsion",
+    "description": "A universal distorsion pedal brought to you by the FAK team.",
+    "isInstrument": false,
+    "source": "distorsion.cmajor"
+}

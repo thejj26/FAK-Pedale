@@ -1,9 +1,0 @@
-{
-    "CmajorVersion": 1,
-    "ID": "com.fak.demo_fuzz",
-    "version": "1.0",
-    "name": "demo_fuzz",
-    "description": "Basic fuzz distorsion effect pedal",
-    "isInstrument": false,
-    "source": "demo_fuzz.cmajor"
-}

@@ -1,0 +1,59 @@
+processor distorsion
+{
+    input stream float audioIn;     //input
+    output stream float audioOut;   //output
+
+    input event int gainParam [[ name: "Gain", min: 1, max: 100, init: 10, step:1, unit:"×"]];          //gain knob (1-100x)
+    input event float drive_pParam [[ name: "Treshold +", min: 0.1, max: 1.0, init: 0.5]];              //treshold + (0.1 do 1.0)
+    input event float drive_nParam [[ name: "Treshold -", min: 0.1, max: 1.0, init: -0.5 ]];            //treshold - (0.1 do 1.0 ali -)
+    input event float toneParam  [[ name: "Tone", min: 0.0, max: 1.0, init: 0.5 ]];                     //low-pass knob (0.0 do 1.0, sta vise to vise propusta)
+    input event float volumeParam[[ name: "Volume", min: 0, max: 100, init: 50 , unit:"%", step:1]];    //volume (0-100%)
+    input event bool softClip [[name:"Soft clipping", boolean, init:false]];                            //soft clipping prekidac za "overdrive" efekt
+
+    int gain = 10;
+    float drive_p = 0.5f;
+    float drive_n = -0.5f;
+    float tone = 0.5f;
+    float volume= 0.5;
+    bool soft_clip = false;
+    
+    float lastSample = 0.0f;    //pamti prosli sample za rad low pass filtera
+//eventovi handleaju promjene parametara
+    event gainParam (int newValue)  { gain = newValue; }
+    event drive_pParam (float newValue)  { drive_p = newValue; }
+    event drive_nParam (float newValue)  { drive_n = -newValue; }
+    event toneParam (float newValue)   { tone = newValue; }
+    event volumeParam (float newValue) { volume = newValue/100; }
+    event softClip (bool newValue) { soft_clip = newValue; }
+
+    void main()
+    {
+        loop
+        {
+            float sample = audioIn; //trenutni audio sample
+//1. STAGE - gain
+            sample = sample * gain; 
+//2. STAGE - clipping
+            if(soft_clip) sample = tanh(sample);    //soft-clipping putem tanh (dosta linearno, pri visim vrijednostima ima trazeni efekt)
+            else{                                   //hard clipping, ovde se gleda drive treshold
+                if (sample > drive_p)
+                {
+                    sample = drive_p;
+                }
+                else if (sample < drive_n)
+                {
+                    sample = drive_n;
+                }
+            }
+//3. STAGE - low pass filter
+            float alpha = tone * 0.8f + 0.05f;                      //jacina filtera, izmedu 0.05 i 0.85 tako da se izbjegnu oba ekstrema
+            sample = lastSample + alpha * (sample - lastSample);    //primjenjuje se filter
+            lastSample = sample;
+//4. STAGE - volume
+            sample = sample * volume;
+
+            audioOut <- sample; //modificirani sample ide na output
+            advance();  //prelazi na iduci sample
+        }
+    }
+}
