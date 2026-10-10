@@ -1,0 +1,53 @@
+processor demo_fuzz
+{
+    input stream float audioIn;
+    output stream float audioOut;
+
+    input event float gainParam [[ name: "Gain", min: 1.0, max: 50.0, init: 10.0 ]];
+    input event float drive_pParam [[ name: "Drive +", min: 0.1, max: 1.0, init: 0.5]];
+    input event float drive_nParam [[ name: "Drive -", min: -1.0, max: -0.1, init: -0.5 ]];
+    input event float toneParam  [[ name: "Tone", min: 0.0, max: 1.0, init: 0.5 ]];
+    input event float volumeParam[[ name: "Volume", min: 0.0, max: 1.0, init: 0.5 ]];
+
+    float gain = 10.0f;
+    float drive_p = 0.5f;
+    float drive_n = -0.5f;
+    float tone = 0.5f;
+    float volume = 0.5f;
+    
+    float lastSample = 0.0f;
+
+    event gainParam (float newValue)  { gain = newValue; }
+    event drive_pParam (float newValue)  { drive_p = newValue; }
+    event drive_nParam (float newValue)  { drive_n = newValue; }
+    event toneParam (float newValue)   { tone = newValue; }
+    event volumeParam (float newValue) { volume = newValue; }
+
+    void main()
+    {
+        loop
+        {
+            float sample = audioIn;
+
+            sample = sample * gain;
+
+            if (sample > drive_p/0.1)
+            {
+                sample = drive_p;
+            }
+            else if (sample < drive_n)
+            {
+                sample = drive_n;
+            }
+
+            float alpha = tone * 0.8f + 0.05f;
+            sample = lastSample + alpha * (sample - lastSample);
+            lastSample = sample;
+
+            sample = sample * volume;
+
+            audioOut <- sample;
+            advance();
+        }
+    }
+}
